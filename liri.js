@@ -1,53 +1,63 @@
 //Load the fs package to read and write
-var fs = require("fs");
+const fs = require("fs");
 
 //Load the spotify api package
-var Spotify = require('node-spotify-api');
+const Spotify = require('node-spotify-api');
 
 //Read and set environment variables with dotenv package
 require('dotenv').config();
 
 //Load the keys js file
-var keys = require("./keys");
+const keys = require("./keys");
 
 //Load the moment package
-var moment = require('moment');
+const moment = require('moment');
 
 //Load the axios package
-var axios = require("axios");
+const axios = require("axios");
 
 //Access spotify keys from environment variables
-var spotify = new Spotify(keys.spotify);
+const spotify = new Spotify(keys.spotify);
 
 //Get the command name passed to this CLI
-var commandName = process.argv[2];
+const commandName = process.argv[2];
 
-//Switch statement that will redirect to a particluar function based on the command that was passed into the CLI
-switch (commandName) {
-    case "concert-this":
-        concertThis();
-        break;
-    case "spotify-this-song":
-        spotifyThisSong();
-        break;
-    case "movie-this":
-        movieThis();
-        break;
-    case "do-what-it-says":
-        doWhatItSays();
-        break;
-    default:
-        logMessage("No valid command passed!");
-        break;
+//Get the second argument passed to the CLI
+let arg2 = process.argv[3];
+
+//Run the command function associated with the command name
+runCommand(commandName);
+
+//Function will run the function associated with the command passed to it. 
+function runCommand(commandName) {
+
+    //Switch statement that will redirect to a particluar function based on the command that was passed into the CLI
+    switch (commandName) {
+        case "concert-this":
+            concertThis();
+            break;
+        case "spotify-this-song":
+            spotifyThisSong();
+            break;
+        case "movie-this":
+            movieThis();
+            break;
+        case "do-what-it-says":
+            doWhatItSays();
+            break;
+        default:
+            logMessage("No valid command passed!");
+            break;
+    }
 }
 
 //Function to log a message to a text file and to the console
 function logMessage(message) {
 
     //Log message to a a log.txt file
-    fs.appendFile("log.txt", `${message}\n`, function (err) {
+    fs.appendFile("log.txt", `${message}\n`, err => {
         if (err) {
-            return console.log(err);
+            return console.log("Error logging message", err);
         }
     });
 
@@ -58,7 +68,7 @@ function logMessage(message) {
 //Function to run when the "concert-this" command is used
 function concertThis() {
 
-    var artist = process.argv[3];
+    const artist = arg2;
 
     //If the artist name is not entered then display an error to the user
     //Otherwise build the query url to bands in town api and send request via axios
@@ -68,14 +78,14 @@ function concertThis() {
     } else {
 
         //Build the query url to bands in town api
-        var queryUrl = `https://rest.bandsintown.com/artists/${encodeURI(artist)}/events?app_id=codingbootcamp`
+        const queryUrl = `https://rest.bandsintown.com/artists/${encodeURI(artist)}/events?app_id=codingbootcamp`
 
         // Create a request with axios to the queryUrl
         axios.get(queryUrl).then(
-            function (response) {
+            response => {
 
                 //Build out a string for the message that we'll log to the console and in a text file
-                var messageArray = [];
+                const messageArray = [];
 
                 messageArray.push("=====================================");
                 messageArray.push(`"Concert This" results for ${artist}`);
@@ -103,22 +113,23 @@ function spotifyThisSong() {
 
     //Get the song name passed in as a parameter
     //If the song name was not passed then use default
-    var songName = process.argv[3] ? process.argv[3] : "The Sign";
+    const songName = arg2 ? arg2 : "The Sign";
 
     //Use the spotify api package to search for the song the user entered
     spotify
         .search({ type: 'track', query: songName })
-        .then(function (response) {
+        .then(
+            response => {
 
             //Build out a string for the message that we'll log to the console and in a text file
-            var messageArray = [];
+            const messageArray = [];
 
             messageArray.push("=====================================");
             messageArray.push(`"Spotify This Song" results for "${songName}"`);
             messageArray.push("=====================================");
 
             //Sort the results by song name
-            var sortedResults = response.tracks.items.sort(spotifyItemSortBySongName);
+            const sortedResults = response.tracks.items.sort(spotifyItemSortBySongName);
 
             //Loop thru all the tracks that we received and push the details of each track to the message array
             sortedResults.forEach(track => {
@@ -126,7 +137,7 @@ function spotifyThisSong() {
                 //console.log(track);
 
                 //Loop thru the artists and build out the artist string
-                var artists = "";
+                let artists = "";
                 track.artists.forEach(artist => {
                     artists += artist.name + ",";
                 });
@@ -152,17 +163,17 @@ function spotifyThisSong() {
 function movieThis() {
     //Get the movie name passed in as a parameter
     //If the moive name was not passed then use default
-    var songName = process.argv[3] ? process.argv[3] : "Mr. Nobody.";
+    const songName = arg2 ? arg2 : "Mr. Nobody.";
 
     //Build the query url to the omdb api
-    var queryUrl = `http://www.omdbapi.com/?t=${encodeURI(songName)}&plot=short&apikey=trilogy`
+    const queryUrl = `http://www.omdbapi.com/?t=${encodeURI(songName)}&plot=short&apikey=trilogy`
 
     // Create a request with axios to the queryUrl
     axios.get(queryUrl).then(
-        function (response) {
+        response => {
 
             //Build out a string for the message that we'll log to the console and in a text file
-            var messageArray = [];
+            const messageArray = [];
 
             messageArray.push("=====================================");
             messageArray.push(`"Movie This" results for ${songName}`);
@@ -189,6 +200,32 @@ function movieThis() {
 //Function to run when the "do-what-it-says" command is used
 function doWhatItSays() {
 
+    //Read the random.txt file and run the command that is in the file
+    fs.readFile("random.txt", "utf8", (err, data) => {
+        if (err) {
+            return console.log(err);
+        }
+
+        //Split the string in the file by comma
+        const params = data.split(",");
+
+        //If no parameters are found in the file then log a message
+        //Else process the command in the file
+        if (!params || params.length === 0) {
+            logMessage("No parameters found in file!");
+        } else {
+
+            //Set the second argument
+            //If there is none in the file then just set the argument to blank
+            arg2 = params.length >= 2 ? params[1].trim() : "";
+
+            //Remove any leading or trailing double or singe quotes
+            arg2 = arg2.replace(/(^")|("$)/g, "").replace(/(^')|('$)/g, "");
+
+            //Run the command associated with the command name passed in the file
+            runCommand(params[0].trim());
+        }
+    });
 }
 
 //Function to sort spotify songs by song name
