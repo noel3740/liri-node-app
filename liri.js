@@ -70,14 +70,14 @@ function logCommandResults(messageDetailsArray, commandDetailName, resultsFor) {
     //Build out a string for the message that we'll log to the console and in a text file
     let messageArray = [];
 
-    messageArray.push("=====================================");
+    messageArray.push("=========================================================");
     messageArray.push(`"${commandDetailName}" results for "${resultsFor}"`);
-    messageArray.push("=====================================");
+    messageArray.push("=========================================================");
 
     //Add the message details array
     messageArray = messageArray.concat(messageDetailsArray);
 
-    messageArray.push("=====================================");
+    messageArray.push("=========================================================");
 
     //Log the message array (sperated by a new line for each item in the array) to the console and text file
     logMessage(messageArray.join("\n"));
@@ -208,25 +208,36 @@ function doWhatItSays() {
             return console.log(err);
         }
 
-        //Split the string in the file by comma
-        const params = data.split(",");
+        //Allow multiple commands seperated by new lines in the text file
+        const lines = data.split("\n");
 
-        //If no parameters are found in the file then log a message
-        //Else process the command in the file
-        if (!params || params.length === 0) {
-            logMessage("No parameters found in file!");
-        } else {
+        //Loop thru each line and run the command on that line
+        lines.forEach((line, index) => {
 
-            //Set the second argument
-            //If there is none in the file then just set the argument to blank
-            arg2 = params.length >= 2 ? params[1].trim() : "";
+            //Only run if the line is not blank
+            if (line.trim().length > 0) {
+                //Split the string in the file by comma
+                const params = line.split(",");
 
-            //Remove any leading or trailing double or singe quotes
-            arg2 = arg2.replace(/(^")|("$)/g, "").replace(/(^')|('$)/g, "");
+                //If no parameters are found in the file then log a message
+                //Else process the command in the file
+                if (!params || params.length === 0) {
+                    logMessage(`No parameters found in file line ${index + 1}!`);
+                } else {
 
-            //Run the command associated with the command name passed in the file
-            runCommand(params[0].trim());
-        }
+                    //Set the second argument
+                    //If there is none in the file then just set the argument to blank
+                    arg2 = params.length >= 2 ? params[1].trim() : "";
+
+                    //Remove any leading or trailing double or singe quotes
+                    arg2 = arg2.replace(/(^")|("$)/g, "").replace(/(^')|('$)/g, "");
+
+                    //Run the command associated with the command name passed in the file
+                    runCommand(params[0].trim());
+                }
+            }
+        });
+
     });
 }
 
