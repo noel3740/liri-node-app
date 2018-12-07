@@ -132,7 +132,7 @@ function spotifyThisSong() {
                 });
 
                 messageArray.push(`Song Name: ${track.name}`);
-                messageArray.push(`\t Artist(s): ${artists}`); 
+                messageArray.push(`\t Artist(s): ${artists}`);
                 messageArray.push(`\t Album ${track.album.name}`);
                 messageArray.push(`\t Preview Link: ${track.preview_url}`);
             });
@@ -150,7 +150,40 @@ function spotifyThisSong() {
 
 //Function to run when the "movie-this" command is used
 function movieThis() {
+    //Get the movie name passed in as a parameter
+    //If the moive name was not passed then use default
+    var songName = process.argv[3] ? process.argv[3] : "Mr. Nobody.";
 
+    //Build the query url to the omdb api
+    var queryUrl = `http://www.omdbapi.com/?t=${encodeURI(songName)}&plot=short&apikey=trilogy`
+
+    // Create a request with axios to the queryUrl
+    axios.get(queryUrl).then(
+        function (response) {
+
+            //Build out a string for the message that we'll log to the console and in a text file
+            var messageArray = [];
+
+            messageArray.push("=====================================");
+            messageArray.push(`"Movie This" results for ${songName}`);
+            messageArray.push("=====================================");
+
+            //Add the details of the movie to the message array
+            messageArray.push(`Title: ${response.data.Title}`);
+            messageArray.push(`\t Year: ${response.data.Year}`);
+            messageArray.push(`\t IMDB Rating: ${response.data.imdbRating}`);
+            messageArray.push(`\t Rotten Tomatoes Rating: ${response.data.Ratings.find(rating => rating.Source.toLowerCase() === 'rotten tomatoes').Value}`);
+            messageArray.push(`\t Country: ${response.data.Country}`);
+            messageArray.push(`\t Language: ${response.data.Language}`);
+            messageArray.push(`\t Actors: ${response.data.Actors}`);
+            messageArray.push(`\t Plot: ${response.data.Plot}`);
+
+            messageArray.push("=====================================");
+
+            //Log the message array (sperated by a new line for each item in the array) to the console and text file
+            logMessage(messageArray.join("\n"));
+        }
+    );
 }
 
 //Function to run when the "do-what-it-says" command is used
@@ -164,12 +197,12 @@ function spotifyItemSortBySongName(itemA, itemB) {
     var nameA = itemA.name.toUpperCase(); // ignore upper and lowercase
     var nameB = itemB.name.toUpperCase(); // ignore upper and lowercase
     if (nameA < nameB) {
-      return -1;
+        return -1;
     }
     if (nameA > nameB) {
-      return 1;
+        return 1;
     }
-  
+
     // names must be equal
     return 0;
 }
