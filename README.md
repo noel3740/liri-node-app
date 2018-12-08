@@ -25,7 +25,7 @@ There are 4 basic commands of LIRI:
 2. `spotify-this-song`
     * To run this command you type into terminal the following: `node liri spotify-this-song '<song name here>'`
         * `song name` is an optional parameter. If not entered then "The Sign" will be the song name searched. 
-    * This command will utilize the [node-spotify-api](https://www.npmjs.com/package/node-spotify-api) package to search the       Spotify API and show the following information about the song in your terminal window and log.txt file:
+    * This command will utilize the [node-spotify-api package](https://www.npmjs.com/package/node-spotify-api) to search the       Spotify API and show the following information about the song in your terminal window and log.txt file:
 
         * Artist(s)
 
