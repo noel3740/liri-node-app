@@ -7,12 +7,12 @@ This is LIRI. It's like iPhone's SIRI but a _Language_ Interpretation and Recogn
 ### Instructions
 
 LIRI requires Node.js to be installed to run. The command line to run LIRI is:
-`node liri <command name> <search parameter>`
+`node liri <command name> '<search parameter>'`
 
 There are 4 basic commands of LIRI:
 
 1. `concert-this`
-    * To run this command you type into terminal the following: `node liri concert-this <artist/band name here>`
+    * To run this command you type into terminal the following: `node liri concert-this '<artist/band name here>'`
     * This will search the Bands in Town Artist Events API using the [npm axios package](https://www.npmjs.com/package/axios) for an artist and render the following information about each event to the terminal window and log.txt file:
 
         * Name of the venue
