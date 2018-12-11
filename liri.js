@@ -16,17 +16,17 @@ const moment = require('moment');
 //Load the axios package
 const axios = require("axios");
 
+//Load the inquirer package
+var inquirer = require("inquirer");
+
 //Access spotify keys from environment variables
 const spotify = new Spotify(keys.spotify);
-
-//Get the command name passed to this CLI
-const commandName = process.argv[2];
 
 //Get the second argument passed to the CLI
 let arg2 = process.argv[3];
 
 //Run the command function associated with the command name
-runCommand(commandName);
+//runCommand(commandName);
 
 //Function will run the function associated with the command passed to it. 
 function runCommand(commandName) {
@@ -256,3 +256,54 @@ function spotifyItemSortBySongName(itemA, itemB) {
     // names must be equal
     return 0;
 }
+
+//Function to prompt user for which command they want to run
+function promptForCommand() {
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                name: "commandToRun",
+                message: "Select a command to run",
+                choices: ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"]
+            }
+        ])
+        .then(commandPrompt => {
+            switch (commandPrompt.commandToRun) {
+                case "concert-this":
+                    promptForArg2("Enter an artist/band name to search", "Foo Fighters", commandPrompt.commandToRun);
+                    break;
+                case "spotify-this-song":
+                    promptForArg2("Enter a song name to search", "The Sign", commandPrompt.commandToRun);
+                    break;
+                case "movie-this":
+                    promptForArg2("Enter a movie to search", "Mr. Nobody.", commandPrompt.commandToRun);
+                    break;
+                default:
+                    runCommand(commandPrompt.commandToRun);
+                    break;
+            }
+        });
+}
+
+//Prompt the user for the second argument
+function promptForArg2(arg2PromptMessage, defaultArg2Value, commandName) {
+    if (arg2PromptMessage && arg2PromptMessage.length > 0) {
+        inquirer
+            .prompt([
+                {
+                    type: "input",
+                    name: "ar2",
+                    default: defaultArg2Value,
+                    message: arg2PromptMessage
+                }
+            ])
+            .then(arg2Prompt => {
+                arg2 = arg2Prompt.ar2;
+                runCommand(commandName);
+            });
+    }
+}
+
+//Start the prompt for the user to select a command
+promptForCommand();
