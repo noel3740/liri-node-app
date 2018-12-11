@@ -25,9 +25,6 @@ const spotify = new Spotify(keys.spotify);
 //Get the second argument passed to the CLI
 let arg2 = process.argv[3];
 
-//Run the command function associated with the command name
-//runCommand(commandName);
-
 //Function will run the function associated with the command passed to it. 
 function runCommand(commandName) {
 
